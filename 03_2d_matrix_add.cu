@@ -45,7 +45,11 @@ int main() {
     cudaMemcpy(d_B, h_B, total_bytes, cudaMemcpyHostToDevice);
 
     dim3 threadPerBlock(16, 16);
-    dim3 blockPerGrid(5, 5);
+
+    int blocksPerGridY = (M + threadPerBlock.y - 1) / threadPerBlock.y;
+    int blocksPerGridX = (N + threadPerBlock.x - 1) / threadPerBlock.x;
+
+    dim3 blockPerGrid(blocksPerGridX, blocksPerGridY);
 
     add_matricies<<<blockPerGrid, threadPerBlock>>>(d_A, d_B, d_C, N, M);
 
@@ -53,7 +57,7 @@ int main() {
 
     for (int i = 0; i < M; i++) {
         for (int j = 0; j < N; j++) {
-            printf("%d ", h_C[i*M + j]); 
+            printf("%d ", h_C[i*N + j]); 
             if(j == N-1) printf("\n");
         }
     }
